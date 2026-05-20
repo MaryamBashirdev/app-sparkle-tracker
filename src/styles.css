@@ -339,49 +339,6 @@
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,0.4); }
 
-/* === Auth === */
-.auth-field {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.auth-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  color: #64748b;
-  pointer-events: none;
-}
-.auth-input {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 12px 14px 12px 38px;
-  color: #f1f5f9;
-  font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-  outline: none;
-}
-.auth-input::placeholder { color: #64748b; }
-.auth-input:focus {
-  border-color: rgba(124, 58, 237, 0.7);
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.18);
-}
-
-@keyframes shakeX {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-10px); }
-  40% { transform: translateX(10px); }
-  60% { transform: translateX(-6px); }
-  80% { transform: translateX(6px); }
-}
-.shake { animation: shakeX 0.55s cubic-bezier(.36,.07,.19,.97); }
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;

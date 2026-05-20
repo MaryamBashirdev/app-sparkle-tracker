@@ -11,8 +11,6 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { Background } from "@/components/Background";
 import { Sidebar, MobileNav } from "@/components/Sidebar";
-import { AuthProvider, useAuth } from "@/lib/auth";
-import { LoginPage } from "@/components/LoginPage";
 
 function NotFoundComponent() {
   return (
@@ -90,38 +88,6 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AuthGate />
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: "rgba(10,10,20,0.9)",
-              border: "1px solid rgba(124,58,237,0.4)",
-              color: "#f1f5f9",
-              backdropFilter: "blur(20px)",
-            },
-          }}
-        />
-      </AuthProvider>
-    </QueryClientProvider>
-  );
-}
-
-function AuthGate() {
-  const { isAuthenticated, ready } = useAuth();
-  if (!ready) {
-    return <div className="min-h-screen" style={{ background: "#080811" }} />;
-  }
-  if (!isAuthenticated) {
-    return (
-      <div key="login" className="fade-up">
-        <LoginPage />
-      </div>
-    );
-  }
-  return (
-    <div key="app" className="fade-up">
       <Background />
       <Sidebar />
       <main className="min-h-screen md:pl-16 pb-20 md:pb-0">
@@ -133,6 +99,17 @@ function AuthGate() {
       <footer className="py-6 text-center text-xs text-slate-500 md:pl-16">
         ⚡ Powered by n8n • Live sync with Google Sheets • Auto-updates every 30s
       </footer>
-    </div>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: "rgba(10,10,20,0.9)",
+            border: "1px solid rgba(124,58,237,0.4)",
+            color: "#f1f5f9",
+            backdropFilter: "blur(20px)",
+          },
+        }}
+      />
+    </QueryClientProvider>
   );
 }

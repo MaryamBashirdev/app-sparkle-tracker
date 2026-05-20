@@ -1,6 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, ClipboardList, Calendar, TrendingUp, Settings, Sparkles, LogOut } from "lucide-react";
-import { useAuth } from "@/lib/auth";
+import { Home, ClipboardList, Calendar, TrendingUp, Settings, Sparkles } from "lucide-react";
 
 const items = [
   { to: "/", label: "Dashboard", icon: Home },
@@ -12,7 +11,6 @@ const items = [
 
 export function Sidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { logout } = useAuth();
   return (
     <aside className="sidebar group fixed left-0 top-0 z-40 hidden h-screen flex-col border-r border-white/5 bg-[#06060c]/70 backdrop-blur-xl md:flex">
       <div className="flex h-16 items-center gap-2 px-5 overflow-hidden whitespace-nowrap">
@@ -39,18 +37,8 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="px-2 py-3 border-t border-white/5 space-y-1">
-        <button
-          onClick={logout}
-          className="sidebar-item w-[calc(100%-16px)] text-left hover:!text-rose-300"
-          title="Log out"
-        >
-          <LogOut className="h-5 w-5 shrink-0" />
-          <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-            Log out
-          </span>
-        </button>
-        <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap px-5 py-2">
+      <div className="px-4 py-4 border-t border-white/5">
+        <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
           <span className="pulse-dot shrink-0" />
           <span className="text-xs text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
             ⚡ n8n Automated
