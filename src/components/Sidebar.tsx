@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, ClipboardList, Calendar, TrendingUp, Settings, Sparkles } from "lucide-react";
+import { Home, ClipboardList, Calendar, TrendingUp, Settings, Sparkles, LogOut } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 const items = [
   { to: "/", label: "Dashboard", icon: Home },
