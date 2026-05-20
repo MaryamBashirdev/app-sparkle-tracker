@@ -39,8 +39,18 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="px-4 py-4 border-t border-white/5">
-        <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
+      <div className="px-2 py-3 border-t border-white/5 space-y-1">
+        <button
+          onClick={logout}
+          className="sidebar-item w-[calc(100%-16px)] text-left hover:!text-rose-300"
+          title="Log out"
+        >
+          <LogOut className="h-5 w-5 shrink-0" />
+          <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+            Log out
+          </span>
+        </button>
+        <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap px-5 py-2">
           <span className="pulse-dot shrink-0" />
           <span className="text-xs text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
             ⚡ n8n Automated
