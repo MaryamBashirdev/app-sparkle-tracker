@@ -44,7 +44,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "JobTrack — Application Tracker" },
       { name: "description", content: "Premium job application tracker with live Google Sheets sync." },
-      { name: "theme-color", content: "#080810" },
+      { name: "theme-color", content: "#080811" },
       { property: "og:title", content: "JobTrack — Application Tracker" },
       { name: "twitter:title", content: "JobTrack — Application Tracker" },
       { property: "og:description", content: "Premium job application tracker with live Google Sheets sync." },
