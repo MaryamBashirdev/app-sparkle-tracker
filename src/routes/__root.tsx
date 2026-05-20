@@ -11,6 +11,8 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { Background } from "@/components/Background";
 import { Sidebar, MobileNav } from "@/components/Sidebar";
+import { AuthProvider, useAuth } from "@/lib/auth";
+import { LoginPage } from "@/components/LoginPage";
 
 function NotFoundComponent() {
   return (
