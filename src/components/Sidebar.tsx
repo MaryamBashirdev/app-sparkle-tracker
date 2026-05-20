@@ -12,6 +12,7 @@ const items = [
 
 export function Sidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { logout } = useAuth();
   return (
     <aside className="sidebar group fixed left-0 top-0 z-40 hidden h-screen flex-col border-r border-white/5 bg-[#06060c]/70 backdrop-blur-xl md:flex">
       <div className="flex h-16 items-center gap-2 px-5 overflow-hidden whitespace-nowrap">
