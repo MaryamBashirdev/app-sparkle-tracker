@@ -90,17 +90,9 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <Background />
-      <Sidebar />
-      <main className="min-h-screen md:pl-16 pb-20 md:pb-0">
-        <div className="mx-auto max-w-[1400px] px-4 md:px-8 py-6">
-          <Outlet />
-        </div>
-      </main>
-      <MobileNav />
-      <footer className="py-6 text-center text-xs text-slate-500 md:pl-16">
-        ⚡ Powered by n8n • Live sync with Google Sheets • Auto-updates every 30s
-      </footer>
+      <AuthProvider>
+        <AuthGate />
+      </AuthProvider>
       <Toaster
         position="top-right"
         toastOptions={{
@@ -114,4 +106,57 @@ function RootComponent() {
       />
     </QueryClientProvider>
   );
+}
+
+function AuthGate() {
+  const { user, ready } = useAuth();
+  const pathname = useRouterStatePath();
+
+  const isLogin = pathname === "/login";
+
+  // Redirect unauthenticated users to /login (except already there)
+  useEffect(() => {
+    if (!ready) return;
+    if (!user && !isLogin) {
+      window.history.replaceState({}, "", "/login");
+      // trigger router by dispatching popstate
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    }
+  }, [ready, user, isLogin]);
+
+  if (!ready) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Background />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (isLogin || !user) {
+    return <Outlet />;
+  }
+
+  return (
+    <>
+      <Background />
+      <Sidebar />
+      <main className="min-h-screen md:pl-16 pb-20 md:pb-0">
+        <div className="mx-auto max-w-[1400px] px-4 md:px-8 py-6">
+          <Outlet />
+        </div>
+      </main>
+      <MobileNav />
+      <footer className="py-6 text-center text-xs text-slate-500 md:pl-16">
+        ⚡ Powered by n8n • Live sync with Google Sheets • Auto-updates every 30s
+      </footer>
+    </>
+  );
+}
+
+function useRouterStatePath() {
+  // Lazy import to avoid circular issues
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { useRouterState } = require("@tanstack/react-router");
+  return useRouterState({ select: (s: any) => s.location.pathname });
 }
