@@ -156,8 +156,5 @@ function AuthGate() {
 }
 
 function useRouterStatePath() {
-  // Lazy import to avoid circular issues
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { useRouterState } = require("@tanstack/react-router");
-  return useRouterState({ select: (s: any) => s.location.pathname });
+  return useRouterState({ select: (s) => s.location.pathname });
 }
