@@ -9,7 +9,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { Toaster } from "sonner";
-import { useEffect } from "react";
+
 
 import appCss from "../styles.css?url";
 import { Background } from "@/components/Background";
