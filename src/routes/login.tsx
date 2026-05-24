@@ -178,7 +178,11 @@ function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-xs text-slate-500">
+          <div className="mt-5 rounded-lg border border-violet-500/20 bg-violet-500/5 px-3 py-2 text-[11px] text-slate-400">
+            <span className="text-slate-300 font-medium">Demo:</span> {HARDCODED_USER.email} / {HARDCODED_USER.password}
+          </div>
+
+          <p className="mt-4 text-center text-xs text-slate-500">
             🔒 Secured by JobTrack
           </p>
         </div>
