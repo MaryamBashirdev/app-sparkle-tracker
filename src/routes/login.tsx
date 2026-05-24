@@ -20,7 +20,7 @@ function LoginPage() {
   const search = useRouterState({ select: (s) => s.location.search as { redirect?: string } });
 
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState(HARDCODED_USER.email);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [remember, setRemember] = useState(true);
