@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, useRouterState } from "@tanstack/react-ro
 import { useEffect, useState } from "react";
 import { Mail, Lock, Eye, EyeOff, Sparkles, Loader2, ArrowRight } from "lucide-react";
 import { Background } from "@/components/Background";
-import { useAuth, HARDCODED_USER } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
