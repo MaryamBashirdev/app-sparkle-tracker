@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, ClipboardList, Calendar, TrendingUp, Settings, Sparkles } from "lucide-react";
+import { Home, ClipboardList, Calendar, TrendingUp, Settings, Sparkles, LogOut } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 const items = [
   { to: "/", label: "Dashboard", icon: Home },
@@ -11,6 +12,7 @@ const items = [
 
 export function Sidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { logout } = useAuth();
   return (
     <aside className="sidebar group fixed left-0 top-0 z-40 hidden h-screen flex-col border-r border-white/5 bg-[#06060c]/70 backdrop-blur-xl md:flex">
       <div className="flex h-16 items-center gap-2 px-5 overflow-hidden whitespace-nowrap">
@@ -37,7 +39,11 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="px-3 py-3 border-t border-white/5">
+      <div className="px-3 py-3 border-t border-white/5 space-y-2">
+        <button onClick={logout} className="sidebar-item w-full text-rose-300 hover:text-rose-200" title="Log out">
+          <LogOut className="h-5 w-5 shrink-0" />
+          <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">Log out</span>
+        </button>
         <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap px-3">
           <span className="pulse-dot shrink-0" />
           <span className="text-xs text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
