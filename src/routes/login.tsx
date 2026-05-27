@@ -15,7 +15,7 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const { user, ready, login, signup } = useAuth();
+  const { user, ready, login, signup, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const search = useRouterState({ select: (s) => s.location.search as { redirect?: string } });
 
@@ -40,7 +40,7 @@ function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      if (mode === "login") await login(email, password, remember);
+      if (mode === "login") await login(email, password);
       else await signup(email, password);
       setLeaving(true);
       setTimeout(() => navigate({ to: (search?.redirect as any) || "/", replace: true }), 350);
@@ -118,9 +118,6 @@ function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-5 rounded-lg border border-violet-500/20 bg-violet-500/5 px-3 py-2 text-[11px] text-slate-400">
-            <span className="text-slate-300 font-medium">Demo:</span> {HARDCODED_USER.email} / {HARDCODED_USER.password}
-          </div> 
           <div className="relative my-4">
   <div className="absolute inset-0 flex items-center">
     <div className="w-full border-t border-white/20"></div>
