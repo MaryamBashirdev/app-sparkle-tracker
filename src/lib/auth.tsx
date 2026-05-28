@@ -33,7 +33,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setReady(true);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) =>// Save user token to users table
+if (session?.provider_token) {
+  await supabase.from("users").upsert({
+    id: session.user.id,
+    email: session.user.email,
+    gmail_connected: true,
+    access_token: session.provider_token,
+  });
+} {
       if (session?.user?.email) {
         setUser({ email: session.user.email });
       } else {
