@@ -34,15 +34,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setReady(true);
     });
 
-  const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-  if (session?.provider_token && session.user) {
-    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+  const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
   const u = session?.user;
   if (u?.id && u?.email) {
     setUser({ id: u.id, email: u.email });
   } else {
     setUser(null);
   }
+);
 );
   }
       const u = session?.user;
