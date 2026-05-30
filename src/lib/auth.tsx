@@ -41,16 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   } else {
     setUser(null);
   }
-);
-);
-  }
-      const u = session?.user;
-      if (u?.id && u?.email) {
-        setUser({ id: u.id, email: u.email });
-      } else {
-        setUser(null);
-      }
-    });
+});
 
     return () => listener.subscription.unsubscribe();
   }, []);
