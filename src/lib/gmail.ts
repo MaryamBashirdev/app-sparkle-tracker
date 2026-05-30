@@ -195,8 +195,7 @@ export async function syncGmail(userId: string): Promise<{ added: number; skippe
     added = count ?? rows.length;
   }
 
-  // Mark user as gmail-connected
-  await supabase.from("users").upsert({ id: userId, gmail_connected: true });
+  // await supabase.from("users").upsert({ id: userId, gmail_connected: true });
 
   return { added, skipped: ids.length - rows.length, total: ids.length };
 }
