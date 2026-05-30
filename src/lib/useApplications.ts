@@ -1,13 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchApplications } from "./sheets";
-import { useAuth } from "./auth";
+import { supabase } from "./auth";
 
 export function useApplications() {
-  const { user } = useAuth();
   return useQuery({
-    queryKey: ["applications", user?.id],
-    queryFn: () => fetchApplications(user!.id),
-    enabled: !!user?.id,
+    queryKey: ["applications"],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (!userId) throw new Error("Not authenticated");
+      return fetchApplications(userId);
+    },
     refetchInterval: 30_000,
     staleTime: 25_000,
   });
