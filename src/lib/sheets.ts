@@ -85,19 +85,14 @@ export async function fetchApplications(userId: string): Promise<AppRow[]> {
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
     
-  console.log("Session:", session?.user?.id);
-  console.log("UserId:", userId);
-  console.log("Data:", data);
-  console.log("Error:", error);
-  
   if (error) throw error;
   return (data ?? []).map((r: any) => ({
-    id: r.id,
+    id: String(r.id),
     company: r.company ?? "",
     category: r.category ?? r.status ?? "",
     role: r.role ?? "",
-    summary: r.summary ?? r.ai_summary ?? "",
-    action_required: r.action_required ?? r.source_email ?? "",
+    summary: r.ai_summary ?? r.summary ?? "",
+    action_required: r.source_email ?? r.action_required ?? "",
     interview_date: r.interview_date ? String(r.interview_date).slice(0, 10) : null,
     interview_time: r.interview_time ?? "",
   }));
