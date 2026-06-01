@@ -8,7 +8,16 @@ const supabase = createClient(
 
 export { supabase };
 
-type User = { id: string; email: string };
+type User = { id: string; email: string; name?: string };
+
+function getUserName(u: any): string | undefined {
+  const meta = u?.user_metadata;
+  const display = meta?.display_name || meta?.full_name || meta?.name;
+  if (display) return display.split(" ")[0];
+  const email = u?.email;
+  if (email) return email.split("@")[0];
+  return undefined;
+}
 
 type AuthContextType = {
   user: User | null;
@@ -27,17 +36,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-  const u = data.session?.user;
-  if (u?.id && u?.email) {
-    setUser({ id: u.id, email: u.email });
-  }
-  setReady(true);
-});
+      const u = data.session?.user;
+      if (u?.id && u?.email) {
+        setUser({ id: u.id, email: u.email, name: getUserName(u) });
+      }
+      setReady(true);
+    });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       const u = session?.user;
       if (u?.id && u?.email) {
-        setUser({ id: u.id, email: u.email });
+        setUser({ id: u.id, email: u.email, name: getUserName(u) });
       } else {
         setUser(null);
       }

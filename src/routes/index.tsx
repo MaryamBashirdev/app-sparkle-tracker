@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 import { useApplications } from "@/lib/useApplications";
 import { StatCards } from "@/components/StatCards";
 import { InterviewBanner } from "@/components/InterviewBanner";
@@ -26,6 +27,8 @@ function greeting() {
 }
 
 function Dashboard() {
+  const { user } = useAuth();
+  const firstName = user?.name || user?.email.split("@")[0] || "there";
   const { data: rows = [], isLoading } = useApplications();
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
@@ -36,7 +39,7 @@ function Dashboard() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">
-            {greeting()}, <span className="text-gradient-violet">Maryam</span> 👋
+            {greeting()}, <span className="text-gradient-violet">{firstName}</span> 👋
           </h1>
           <p className="text-sm text-slate-400 mt-1">Welcome back to your application command center.</p>
         </div>
