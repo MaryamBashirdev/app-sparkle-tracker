@@ -3,9 +3,15 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   "https://rzmispdqrsvfhujslrbe.supabase.co",
-  "sb_publishable_..."  // yeh publishable key hai
+  "sb_publishable_nRM_HrzDtduuyqNBTW8TYg_Z1RS2PEH",
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  }
 );
-
 export { supabase };
 
 type User = { id: string; email: string; name?: string };
