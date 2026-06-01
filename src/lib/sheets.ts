@@ -97,7 +97,6 @@ export async function fetchApplications(userId: string): Promise<AppRow[]> {
     interview_time: r.interview_time ?? "",
   }));
 }
-}
 export const STATUS_META: Record<
   string,
   { label: string; color: string; bg: string; ring: string; cls?: string }
