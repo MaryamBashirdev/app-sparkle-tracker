@@ -101,7 +101,7 @@ function RootComponent() {
 function AuthGate() {
   const { user, ready } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isLogin = pathname === "/login";
+  const isPublic = pathname === "/login" || pathname === "/privacy";
 
   if (!ready) {
     return (
@@ -112,8 +112,8 @@ function AuthGate() {
     );
   }
 
-  if (!user && !isLogin) return <Navigate to="/login" replace />;
-  if (isLogin || !user) return <Outlet />;
+  if (!user && !isPublic) return <Navigate to="/login" replace />;
+  if (isPublic || !user) return <Outlet />;
 
   return (
     <>
