@@ -6,7 +6,7 @@ const supabase = createClient(
   "eyJ...",
   {
     auth: {
-      flowType: 'pkce',        // ← yeh add karo
+      flowType: 'pkce',
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
@@ -14,43 +14,6 @@ const supabase = createClient(
   }
 );
 
-Bug 3 — Auth Callback route nahi hai
-src/routes/ mein auth.callback.tsx file banana hai:
-tsximport { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { supabase } from "@/lib/auth";
-
-export const Route = createFileRoute("/auth/callback")({
-  component: AuthCallback,
-});
-
-function AuthCallback() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    supabase.auth.exchangeCodeForSession(window.location.href)
-      .then(({ data }) => {
-        if (data.session) navigate({ to: "/", replace: true });
-        else navigate({ to: "/login", replace: true });
-      });
-  }, []);
-
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p className="text-slate-400">Logging you in...</p>
-    </div>
-  );
-}
-
-Supabase Dashboard mein bhi update karo
-Authentication → URL Configuration:
-Redirect URLs: http://localhost:5173/auth/callback
-Production URL bhi wahan add karna agar deploy kiya hai.
-
-Summary — 3 jagah changes:
-FileChangesrc/lib/auth.tsxflowType: 'pkce' add karo + redirectTo fix karosrc/routes/auth.callback.tsxNai file banaoSupabase DashboardRedirect URL update karo
-Yeh teeno changes karo — login loop khatam ho jayega!
-);
 export { supabase };
 
 type User = { id: string; email: string; name?: string };
