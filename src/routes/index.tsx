@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, Mail, CheckCircle } from "lucide-react";
+import { Bell } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useApplications } from "@/lib/useApplications";
 import { StatCards } from "@/components/StatCards";
@@ -8,7 +8,7 @@ import { ApplicationsTable } from "@/components/ApplicationsTable";
 import { MiniCalendar } from "@/components/MiniCalendar";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { AddApplicationPanel } from "@/components/AddApplicationPanel";
-import { useGmailConnection } from "@/hooks/useGmailConnection";
+
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
@@ -31,7 +31,7 @@ function Dashboard() {
   const { user } = useAuth();
   const firstName = user?.name || user?.email.split("@")[0] || "there";
   const { data: rows = [], isLoading } = useApplications();
-  const { isConnected, connectGmail } = useGmailConnection();
+  
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
 
