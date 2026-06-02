@@ -95,7 +95,7 @@ export function ApplicationsTable({ rows }: { rows: AppRow[] }) {
                       <span className="font-semibold">{r.company}</span>
                     </div>
                   </td>
-                  <td className="py-3 pr-4 text-slate-400">{r.role || "—"}</td>
+                  <td className="py-3 pr-4 text-slate-400">{r.role || "Unknown Role"}</td>
                   <td className="py-3 pr-4"><StatusBadge category={r.category} /></td>
                   <td className="py-3 pr-4 text-slate-300">{formatDate(r.interview_date)}</td>
                   <td className="py-3 pr-4 text-slate-300">
@@ -104,7 +104,7 @@ export function ApplicationsTable({ rows }: { rows: AppRow[] }) {
                         <Clock className="h-3.5 w-3.5 text-cyan-400" /> {r.interview_time}
                       </span>
                     ) : (
-                      "—"
+                      "TBD"
                     )}
                   </td>
                   <td className="py-3 pr-4">

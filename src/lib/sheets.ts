@@ -77,25 +77,35 @@ export async function fetchSheet(): Promise<AppRow[]> {
 }
 
 export async function fetchApplications(userId: string): Promise<AppRow[]> {
-  const { data: { session } } = await supabase.auth.getSession();
-  
   const { data, error } = await supabase
     .from("applications")
-    .select("*")
+    .select("id, company, category, status, role, ai_summary, summary, source_email, action_required, interview_datetime, created_at")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
-    
+
   if (error) throw error;
-  return (data ?? []).map((r: any) => ({
-    id: String(r.id),
-    company: r.company ?? "",
-    category: r.category ?? r.status ?? "",
-    role: r.role ?? "",
-    summary: r.ai_summary ?? r.summary ?? "",
-    action_required: r.source_email ?? r.action_required ?? "",
-    interview_date: r.interview_date ? String(r.interview_date).slice(0, 10) : null,
-    interview_time: r.interview_time ?? "",
-  }));
+  return (data ?? []).map((r: any) => {
+    let interview_date: string | null = null;
+    let interview_time = "";
+    if (r.interview_datetime) {
+      const dt = new Date(r.interview_datetime);
+      if (!isNaN(dt.getTime())) {
+        interview_date = dt.toISOString().slice(0, 10);
+        interview_time = dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+      }
+    }
+    const role = (r.role ?? "").toString().trim();
+    return {
+      id: String(r.id),
+      company: r.company ?? "",
+      category: r.category ?? r.status ?? "",
+      role,
+      summary: r.ai_summary ?? r.summary ?? "",
+      action_required: r.source_email ?? r.action_required ?? "",
+      interview_date,
+      interview_time,
+    };
+  });
 }
 export const STATUS_META: Record<
   string,
