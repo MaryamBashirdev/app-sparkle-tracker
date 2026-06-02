@@ -10,11 +10,10 @@ function AuthCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.exchangeCodeForSession(window.location.href)
-      .then(({ data }) => {
-        if (data.session) navigate({ to: "/", replace: true });
-        else navigate({ to: "/login", replace: true });
-      });
+    supabase.auth.exchangeCodeForSession(window.location.href).then(({ data }) => {
+      if (data.session) navigate({ to: "/", replace: true });
+      else navigate({ to: "/login", replace: true });
+    });
   }, []);
 
   return (
