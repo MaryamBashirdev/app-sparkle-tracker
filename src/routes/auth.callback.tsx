@@ -6,6 +6,7 @@ export const Route = createFileRoute("/auth/callback")({
   component: AuthCallback,
 });
 
+
 function AuthCallback() {
   const navigate = useNavigate();
   
