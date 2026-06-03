@@ -6,7 +6,7 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6bWlzcGRxcnN2Zmh1anNscmJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODczOTYsImV4cCI6MjA5NTM2MzM5Nn0.IsaJr6H3iEN7z4inu1JXbxJ27VdJq5ddYPvAAPAW_NU",
   {
     auth: {
-      flowType: "pkce",
+      flowType: "implicit",
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
