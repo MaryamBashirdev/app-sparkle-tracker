@@ -15,6 +15,8 @@ function AuthCallback() {
       const params = new URLSearchParams(window.location.search);
       const code = params.get("code") || hashParams.get("code");
 
+      console.log("CODE:", code);
+
       if (!code) {
         const { data } = await supabase.auth.getSession();
         if (data.session) {
@@ -26,6 +28,9 @@ function AuthCallback() {
       }
 
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+      console.log("ERROR:", error);
+      console.log("DATA:", data);
+      
       if (!error && data.session) {
         navigate({ to: "/", replace: true });
       } else {
