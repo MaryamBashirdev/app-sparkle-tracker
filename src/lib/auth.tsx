@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw new Error(error.message);
   };
 
-const loginWithGoogle = async () => {
+  const loginWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -82,11 +82,6 @@ const loginWithGoogle = async () => {
         queryParams: { access_type: "offline", prompt: "consent" },
       },
     });
-    if (error) throw new Error(error.message);
-    if (data?.url) {
-      window.location.href = data.url;
-    }
-  };
     if (error) throw new Error(error.message);
     if (data?.url) {
       window.location.href = data.url;
