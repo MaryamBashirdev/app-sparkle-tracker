@@ -6,7 +6,7 @@ const supabase = createClient(
   "eyJ...",
   {
     auth: {
-      flowType: 'implicit',
+      flowType: "implicit",
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
