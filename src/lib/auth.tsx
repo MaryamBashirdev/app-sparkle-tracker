@@ -73,16 +73,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw new Error(error.message);
   };
 
-  const loginWithGoogle = async () => {
-    console.log("loginWithGoogle started!");
+const loginWithGoogle = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: window.location.origin + "/auth/callback",
       },
     });
-    console.log("OAuth response:", data, error);
     if (error) throw new Error(error.message);
+    if (data?.url) {
+      window.location.href = data.url;
+    }
   };
 
   const logout = async () => {
