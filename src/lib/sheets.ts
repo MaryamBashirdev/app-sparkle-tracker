@@ -103,7 +103,7 @@ export async function fetchApplications(_userId?: string): Promise<AppRow[]> {
   console.log("[fetchApplications] user:", uid, "rows:", data?.length ?? 0, data);
 
 
-  return (data ?? []).map((r: any) => {
+  return (data ?? []).filter((r: any) => r.user_id === uid).map((r: any) => {
     let interview_date: string | null = null;
     let interview_time = "";
     if (r.interview_date) {
