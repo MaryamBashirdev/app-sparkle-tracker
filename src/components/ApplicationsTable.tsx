@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, Clock, AlertCircle, Mail, X } from "lucide-react";
+import { Search, Clock, AlertCircle, Mail, X, ExternalLink } from "lucide-react";
 import type { AppRow } from "@/lib/sheets";
 import { statusKey } from "@/lib/sheets";
 import { StatusBadge } from "./StatusBadge";
@@ -193,12 +193,48 @@ function EmailModal({ row, onClose }: { row: AppRow; onClose: () => void }) {
         </div>
         <div className="p-6 overflow-y-auto">
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-200 whitespace-pre-wrap leading-relaxed font-mono">
-            {row.email_body || "No email body available."}
+            {row.email_body ? linkifyText(row.email_body) : "No email body available."}
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+function linkifyText(text: string): React.ReactNode[] {
+  const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)|(\b(?:zoom\.us|meet\.google\.com|teams\.microsoft\.com|webex\.com|gotomeet\.me)(?:\/[^\s]*)?)/gi;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = urlRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    const url = match[0];
+    let href = url;
+    if (!href.startsWith("http://") && !href.startsWith("https://")) {
+      href = "https://" + href;
+    }
+    parts.push(
+      <a
+        key={`link-${match.index}`}
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 underline underline-offset-2"
+      >
+        {url}
+        <ExternalLink className="h-3 w-3 shrink-0 opacity-70" />
+      </a>
+    );
+    lastIndex = match.index + url.length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+  return parts;
 }
 
 function Field({ label, value }: { label: string; value: string }) {
