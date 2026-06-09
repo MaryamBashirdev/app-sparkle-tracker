@@ -126,17 +126,86 @@ const filtered = useMemo(() => {
                       {needs ? "YES" : "NO"}
                     </span>
                   </td>
+                  <td className="py-3 pr-4">
+                    <button
+                      onClick={() => setOpenEmail(r)}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/30 bg-violet-500/10 px-2.5 py-1 text-[11px] font-semibold text-violet-300 hover:bg-violet-500/20 hover:border-violet-500/50 transition-colors"
+                    >
+                      <Mail className="h-3.5 w-3.5" />
+                      View Email
+                    </button>
+                  </td>
                 </tr>
               );
             })}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="py-10 text-center text-slate-500">No applications yet.</td>
+                <td colSpan={7} className="py-10 text-center text-slate-500">No applications yet.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+      {openEmail && <EmailModal row={openEmail} onClose={() => setOpenEmail(null)} />}
+    </div>
+  );
+}
+
+function EmailModal({ row, onClose }: { row: AppRow; onClose: () => void }) {
+  const dateStr = row.email_date
+    ? new Date(row.email_date).toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      })
+    : "—";
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm fade-up"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl max-h-[85vh] overflow-hidden rounded-2xl border border-white/10 bg-[#0b0b14]/95 shadow-[0_30px_80px_-20px_rgba(124,58,237,0.4)] flex flex-col"
+      >
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute right-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
+        >
+          <X className="h-4 w-4" />
+        </button>
+        <div className="p-6 border-b border-white/5">
+          <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-violet-300/80 mb-2">
+            <Mail className="h-3.5 w-3.5" /> Email Details
+          </div>
+          <h2 className="text-lg font-bold text-white pr-10 leading-snug">
+            {row.email_subject || row.role || row.company}
+          </h2>
+        </div>
+        <div className="px-6 py-4 space-y-2 text-sm border-b border-white/5">
+          <Field label="From" value={row.email_from || "—"} />
+          <Field label="To" value={row.email_to || "—"} />
+          <Field label="Date" value={dateStr} />
+          <Field label="Subject" value={row.email_subject || "—"} />
+        </div>
+        <div className="p-6 overflow-y-auto">
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-200 whitespace-pre-wrap leading-relaxed font-mono">
+            {row.email_body || "No email body available."}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex gap-3">
+      <span className="w-16 shrink-0 text-[11px] uppercase tracking-wider text-slate-500 pt-0.5">{label}</span>
+      <span className="text-slate-200 break-all">{value}</span>
     </div>
   );
 }
