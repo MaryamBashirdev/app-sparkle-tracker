@@ -57,20 +57,13 @@ function Dashboard() {
   return (
     <div className="space-y-6">
 
-      {/* Daily Report Time Banner */}
-      {reportTime && (
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
-          <div className="flex items-center gap-2 text-amber-300">
-            <Clock className="h-4 w-4" />
-            <span className="text-sm font-medium">
-              Daily report scheduled at <strong>{reportTime}</strong>
-            </span>
-          </div>
+{/* Daily Report Time Button */}
           <Link
             to="/settings"
-            className="text-xs text-amber-400 hover:text-amber-300 underline underline-offset-2"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2.5 text-sm font-medium text-white hover:opacity-90"
           >
-            Change time
+            <Clock className="h-4 w-4" />
+            Report Time
           </Link>
         </div>
       )}
