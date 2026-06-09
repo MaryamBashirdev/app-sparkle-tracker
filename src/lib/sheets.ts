@@ -1,5 +1,6 @@
 // Google Sheets gviz fetcher + parser
 import { supabase } from "./auth";
+import { extractDateTimeFromText } from "./datetime";
 
 export type AppRow = {
   id: string;
