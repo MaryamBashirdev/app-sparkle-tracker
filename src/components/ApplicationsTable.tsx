@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, Clock, AlertCircle } from "lucide-react";
+import { Search, Clock, AlertCircle, Mail, X } from "lucide-react";
 import type { AppRow } from "@/lib/sheets";
 import { statusKey } from "@/lib/sheets";
 import { StatusBadge } from "./StatusBadge";
