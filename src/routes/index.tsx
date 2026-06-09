@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Bell, Clock } from "lucide-react";
 import { useAuth, supabase } from "@/lib/auth";
 import { useApplications } from "@/lib/useApplications";
@@ -29,6 +29,7 @@ function greeting() {
 
 function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const firstName = user?.name || user?.email.split("@")[0] || "there";
   const { data: rows = [], isLoading } = useApplications();
   const [reportTime, setReportTime] = useState<string | null>(null);
@@ -57,17 +58,6 @@ function Dashboard() {
   return (
     <div className="space-y-6">
 
-{/* Daily Report Time Button */}
-          <Link
-            to="/settings"
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2.5 text-sm font-medium text-white hover:opacity-90"
-          >
-            <Clock className="h-4 w-4" />
-            Report Time
-          </Link>
-        </div>
-      )}
-
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -81,6 +71,13 @@ function Dashboard() {
           <button className="relative rounded-xl border border-white/10 bg-white/5 backdrop-blur p-2.5 hover:bg-white/10">
             <Bell className="h-4 w-4" />
             <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-[#080811]" />
+          </button>
+          <button
+            onClick={() => navigate({ to: "/settings" })}
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2.5 text-sm font-medium text-white hover:opacity-90"
+          >
+            <Clock className="h-4 w-4" />
+            {reportTime ?? "Report Time"}
           </button>
           <AddApplicationPanel />
         </div>
