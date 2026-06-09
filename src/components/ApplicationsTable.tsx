@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
-import { Search, Clock, AlertCircle, Mail, X, ExternalLink } from "lucide-react";
+import { Search, Clock, AlertCircle, Mail, X, ExternalLink, Pencil } from "lucide-react";
 import type { AppRow } from "@/lib/sheets";
 import { statusKey } from "@/lib/sheets";
 import { StatusBadge } from "./StatusBadge";
+import { formatDate, formatTime12 } from "@/lib/datetime";
+import { AddApplicationPanel } from "./AddApplicationPanel";
 
 const AVATAR_COLORS = [
   "#7c3aed", "#06b6d4", "#10b981", "#f59e0b", "#f43f5e", "#6366f1", "#ec4899", "#14b8a6",
@@ -14,11 +16,6 @@ function avatarColor(name: string) {
   return AVATAR_COLORS[h % AVATAR_COLORS.length];
 }
 
-function formatDate(d: string | null) {
-  if (!d) return "—";
-  const dt = new Date(d + "T00:00:00");
-  return dt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
 
 export function ApplicationsTable({ rows }: { rows: AppRow[] }) {
   const [q, setQ] = useState("");
