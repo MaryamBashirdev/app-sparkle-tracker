@@ -21,6 +21,7 @@ export function ApplicationsTable({ rows }: { rows: AppRow[] }) {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
   const [openEmail, setOpenEmail] = useState<AppRow | null>(null);
+  const [editRow, setEditRow] = useState<AppRow | null>(null);
 
   const today = new Date();
 today.setHours(0, 0, 0, 0);
