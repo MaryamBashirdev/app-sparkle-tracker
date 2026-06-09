@@ -193,7 +193,7 @@ function EmailModal({ row, onClose }: { row: AppRow; onClose: () => void }) {
         </div>
         <div className="p-6 overflow-y-auto">
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm text-slate-200 whitespace-pre-wrap leading-relaxed font-mono">
-            {row.email_body || "No email body available."}
+            {row.email_body ? linkifyText(row.email_body) : "No email body available."}
           </div>
         </div>
       </div>
