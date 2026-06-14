@@ -32,15 +32,30 @@ function HRDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const firstName = user?.name || user?.email?.split("@")[0] || "HR";
+  const [candidates, setCandidates] = useState<any[]>([]);
   const [form, setForm] = useState({ name: "", role: "", datetime: "" });
   const [interviews, setInterviews] = useState<any[]>([]);
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSchedule = () => {
+  // Supabase se candidates fetch karo
+  useEffect(() => {
+    supabase
+      .from("applications")
+      .select("id, company, role, status, interview_time, meet_link, source_email, ai_summary")
+      .order("created_at", { ascending: false })
+      .then(({ data }: any) => {
+        if (data) setCandidates(data);
+      });
+  }, []);
+
+  const handleSchedule = async () => {
     if (!form.name || !form.role || !form.datetime) return;
+    setLoading(true);
     setInterviews([...interviews, form]);
     setForm({ name: "", role: "", datetime: "" });
     setSaved(true);
+    setLoading(false);
     setTimeout(() => setSaved(false), 2000);
   };
 
@@ -71,24 +86,60 @@ function HRDashboard() {
         </div>
       </div>
 
-      {/* Candidates Table */}
+      {/* Candidates Table — Supabase se */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
         <h2 className="text-lg font-semibold mb-4">👥 Candidates</h2>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-slate-400 border-b border-white/10">
-              <th className="text-left py-2 pr-4">Name</th>
-              <th className="text-left py-2 pr-4">Role Applied</th>
-              <th className="text-left py-2 pr-4">Status</th>
-              <th className="text-left py-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colSpan={4} className="text-center py-8 text-slate-500">No candidates yet.</td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-slate-400 border-b border-white/10">
+                <th className="text-left py-2 pr-4">Company</th>
+                <th className="text-left py-2 pr-4">Role</th>
+                <th className="text-left py-2 pr-4">Status</th>
+                <th className="text-left py-2 pr-4">Interview Time</th>
+                <th className="text-left py-2">Meet Link</th>
+              </tr>
+            </thead>
+            <tbody>
+              {candidates.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="text-center py-8 text-slate-500">
+                    No candidates yet.
+                  </td>
+                </tr>
+              ) : (
+                candidates.map((c, i) => (
+                  <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td className="py-3 pr-4 text-white font-medium">{c.company}</td>
+                    <td className="py-3 pr-4 text-slate-300">{c.role || "—"}</td>
+                    <td className="py-3 pr-4">
+                      <span className="px-2 py-1 rounded-lg text-xs bg-violet-500/20 text-violet-300">
+                        {c.status}
+                      </span>
+                    </td>
+                    <td className="py-3 pr-4 text-slate-400 text-xs">
+                      {c.interview_time || "—"}
+                    </td>
+                    <td className="py-3">
+                      {c.meet_link ? (
+                        
+                          href={c.meet_link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-cyan-400 hover:underline"
+                        >
+                          🔗 Join Meet
+                        </a>
+                      ) : (
+                        <span className="text-xs text-slate-600">No link</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Schedule Interview */}
@@ -117,9 +168,10 @@ function HRDashboard() {
           />
           <button
             onClick={handleSchedule}
-            className="rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2.5 text-sm font-medium text-white hover:opacity-90"
+            disabled={loading}
+            className="rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
           >
-            Schedule Interview
+            {loading ? "Scheduling..." : "Schedule Interview"}
           </button>
           {saved && <p className="text-xs text-green-400">✅ Interview scheduled!</p>}
         </div>
@@ -141,7 +193,7 @@ function HRDashboard() {
   );
 }
 
-// ── Candidate Dashboard (same as before) ─────────────────
+// ── Candidate Dashboard ───────────────────────────────────
 function Dashboard() {
   const userRole = localStorage.getItem("userRole");
   if (userRole === "hr") return <HRDashboard />;
