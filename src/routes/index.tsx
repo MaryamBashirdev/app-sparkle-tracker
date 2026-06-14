@@ -118,15 +118,15 @@ function HRDashboard() {
                       {c.interview_time || "—"}
                     </td>
                     <td className="py-3">
-                {c.meet_link ? (
-  
-    href={c.meet_link}
-    target="_blank"
-    rel="noreferrer"
-    className="text-xs text-cyan-400 hover:underline"
- <a>
-    🔗 Join Meet
-  </a>
+                      {c.meet_link ? (
+                        <a
+                          href={c.meet_link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-cyan-400 hover:underline"
+                        >
+                          🔗 Join Meet
+                        </a>
                       ) : (
                         <span className="text-xs text-slate-600">No link</span>
                       )}
