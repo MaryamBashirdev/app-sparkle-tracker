@@ -1,3 +1,11 @@
+function Dashboard() {
+  const userRole = localStorage.getItem("userRole");
+  if (userRole === "hr") {
+    window.location.href = "/hr";
+    return null;
+  }
+  // ... baaki sab same rahega
+  
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Bell, Clock } from "lucide-react";
 import { useAuth, supabase } from "@/lib/auth";
