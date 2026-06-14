@@ -27,7 +27,6 @@ function greeting() {
   return "Good evening";
 }
 
-// ── HR Dashboard ──────────────────────────────────────────
 function HRDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -38,7 +37,6 @@ function HRDashboard() {
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Supabase se candidates fetch karo
   useEffect(() => {
     supabase
       .from("applications")
@@ -86,7 +84,6 @@ function HRDashboard() {
         </div>
       </div>
 
-      {/* Candidates Table — Supabase se */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
         <h2 className="text-lg font-semibold mb-4">👥 Candidates</h2>
         <div className="overflow-x-auto">
@@ -142,7 +139,6 @@ function HRDashboard() {
         </div>
       </div>
 
-      {/* Schedule Interview */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
         <h2 className="text-lg font-semibold mb-4">📅 Schedule Interview</h2>
         <div className="flex flex-col gap-3 max-w-md">
@@ -193,7 +189,6 @@ function HRDashboard() {
   );
 }
 
-// ── Candidate Dashboard ───────────────────────────────────
 function Dashboard() {
   const userRole = localStorage.getItem("userRole");
   if (userRole === "hr") return <HRDashboard />;
