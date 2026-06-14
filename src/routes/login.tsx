@@ -24,7 +24,12 @@ function LoginPage() {
 
   useEffect(() => {
     if (ready && user) {
-      navigate({ to: (search?.redirect as any) || "/", replace: true });
+      const savedRole = localStorage.getItem("userRole");
+      if (savedRole === "hr") {
+        navigate({ to: "/hr", replace: true });
+      } else {
+        navigate({ to: (search?.redirect as any) || "/", replace: true });
+      }
     }
   }, [ready, user, navigate, search]);
 
@@ -32,6 +37,7 @@ function LoginPage() {
     setError(null);
     setLoading(true);
     try {
+      if (role) localStorage.setItem("userRole", role);
       await loginWithGoogle();
     } catch (err: any) {
       setError(err?.message || "Something went wrong");
@@ -55,8 +61,6 @@ function LoginPage() {
           </div>
 
           <div className="mt-10 flex flex-col items-center gap-4">
-
-            {/* Step 1: Role Selection */}
             {!role && (
               <div className="w-full flex flex-col gap-3">
                 <p className="text-sm text-slate-400 text-center mb-2">Select your role to continue</p>
@@ -75,7 +79,6 @@ function LoginPage() {
               </div>
             )}
 
-            {/* Step 2: Google Login after role selected */}
             {role && (
               <>
                 <p className="text-sm text-slate-400">
@@ -113,7 +116,6 @@ function LoginPage() {
               </div>
             )}
           </div>
-
           <p className="mt-8 text-center text-xs text-slate-500">🔒 Secured by JobTrack</p>
         </div>
       </div>
