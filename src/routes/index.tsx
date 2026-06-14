@@ -27,6 +27,29 @@ function greeting() {
   return "Good evening";
 }
 
+// Meet link helper — handles different possible column names
+function getMeetLink(c: any): string | null {
+  return (
+    c.meet_link ||
+    c.meeting_link ||
+    c.google_meet_link ||
+    c.meetLink ||
+    c.meetingLink ||
+    null
+  );
+}
+
+// Interview time helper — handles different possible column names
+function getInterviewTime(c: any): string | null {
+  return (
+    c.interview_time ||
+    c.interviewTime ||
+    c.scheduled_at ||
+    c.interview_date ||
+    null
+  );
+}
+
 function HRDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -36,13 +59,22 @@ function HRDashboard() {
   const [interviews, setInterviews] = useState<any[]>([]);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
       .from("applications")
-      .select("id, company, role, status, interview_time, meet_link, source_email, ai_summary")
+      .select("*") // sabhi columns fetch karo taake koi column miss na ho
       .order("created_at", { ascending: false })
-      .then(({ data }: any) => {
+      .then(({ data, error }: any) => {
+        // Debug: Console mein check karo kya aa raha hai
+        console.log("✅ HR Candidates Data:", data);
+        console.log("❌ Error (if any):", error);
+
+        if (error) {
+          setFetchError(error.message);
+          return;
+        }
         if (data) setCandidates(data);
       });
   }, []);
@@ -64,6 +96,7 @@ function HRDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">
@@ -84,8 +117,19 @@ function HRDashboard() {
         </div>
       </div>
 
+      {/* Error Banner */}
+      {fetchError && (
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          ⚠️ Data fetch error: {fetchError}
+        </div>
+      )}
+
+      {/* Candidates Table */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-        <h2 className="text-lg font-semibold mb-4">👥 Candidates</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          👥 Candidates{" "}
+          <span className="text-sm text-slate-400 font-normal">({candidates.length} total)</span>
+        </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -101,44 +145,64 @@ function HRDashboard() {
               {candidates.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="text-center py-8 text-slate-500">
-                    No candidates yet.
+                    {fetchError ? "Error loading data." : "No candidates yet."}
                   </td>
                 </tr>
               ) : (
-                candidates.map((c, i) => (
-                  <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td className="py-3 pr-4 text-white font-medium">{c.company}</td>
-                    <td className="py-3 pr-4 text-slate-300">{c.role || "—"}</td>
-                    <td className="py-3 pr-4">
-                      <span className="px-2 py-1 rounded-lg text-xs bg-violet-500/20 text-violet-300">
-                        {c.status}
-                      </span>
-                    </td>
-                    <td className="py-3 pr-4 text-slate-400 text-xs">
-                      {c.interview_time || "—"}
-                    </td>
-                    <td className="py-3">
-                      {c.meet_link ? (
-                        <a
-                          href={c.meet_link}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-xs text-cyan-400 hover:underline"
+                candidates.map((c, i) => {
+                  const meetLink = getMeetLink(c);
+                  const interviewTime = getInterviewTime(c);
+                  return (
+                    <tr key={c.id ?? i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <td className="py-3 pr-4 text-white font-medium">{c.company || "—"}</td>
+                      <td className="py-3 pr-4 text-slate-300">{c.role || "—"}</td>
+                      <td className="py-3 pr-4">
+                        <span
+                          className={`px-2 py-1 rounded-lg text-xs ${
+                            c.status === "INTERVIEW"
+                              ? "bg-violet-500/20 text-violet-300"
+                              : c.status === "APPLIED"
+                              ? "bg-blue-500/20 text-blue-300"
+                              : c.status === "REJECTED"
+                              ? "bg-red-500/20 text-red-300"
+                              : "bg-white/10 text-slate-300"
+                          }`}
                         >
-                          🔗 Join Meet
-                        </a>
-                      ) : (
-                        <span className="text-xs text-slate-600">No link</span>
-                      )}
-                    </td>
-                  </tr>
-                ))
+                          {c.status || "—"}
+                        </span>
+                      </td>
+                      <td className="py-3 pr-4 text-slate-400 text-xs">
+                        {interviewTime
+                          ? new Date(interviewTime).toLocaleString("en-PK", {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            })
+                          : "—"}
+                      </td>
+                      <td className="py-3">
+                        {meetLink ? (
+                          <a
+                            href={meetLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs text-cyan-400 hover:underline"
+                          >
+                            🔗 Join Meet
+                          </a>
+                        ) : (
+                          <span className="text-xs text-slate-600">No link</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
       </div>
 
+      {/* Schedule Interview */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
         <h2 className="text-lg font-semibold mb-4">📅 Schedule Interview</h2>
         <div className="flex flex-col gap-3 max-w-md">
@@ -176,10 +240,15 @@ function HRDashboard() {
           <div className="mt-6 space-y-2">
             <h3 className="text-sm text-slate-400 mb-2">Upcoming Interviews:</h3>
             {interviews.map((iv, i) => (
-              <div key={i} className="flex gap-4 text-sm border border-white/10 rounded-xl px-4 py-2.5 bg-white/5">
+              <div
+                key={i}
+                className="flex gap-4 text-sm border border-white/10 rounded-xl px-4 py-2.5 bg-white/5"
+              >
                 <span className="text-violet-400 font-medium">{iv.name}</span>
                 <span className="text-slate-400">{iv.role}</span>
-                <span className="text-slate-500 ml-auto">{new Date(iv.datetime).toLocaleString()}</span>
+                <span className="text-slate-500 ml-auto">
+                  {new Date(iv.datetime).toLocaleString()}
+                </span>
               </div>
             ))}
           </div>
@@ -199,7 +268,12 @@ function Dashboard() {
   const { data: rows = [], isLoading } = useApplications();
   const [reportTime, setReportTime] = useState<string | null>(null);
   const now = new Date();
-  const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+  const dateStr = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   useEffect(() => {
     if (!user) return;
@@ -253,7 +327,9 @@ function Dashboard() {
           <ActivityFeed rows={rows} />
         </div>
       </div>
-      {isLoading && <p className="text-center text-xs text-slate-500">Syncing with Google Sheets...</p>}
+      {isLoading && (
+        <p className="text-center text-xs text-slate-500">Syncing with Google Sheets...</p>
+      )}
     </div>
   );
 }
