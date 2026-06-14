@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as HrRouteImport } from './routes/hr'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as ApplicationsRouteImport } from './routes/applications'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
@@ -31,6 +32,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HrRoute = HrRouteImport.update({
+  id: '/hr',
+  path: '/hr',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CalendarRoute = CalendarRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/applications': typeof ApplicationsRoute
   '/calendar': typeof CalendarRoute
   '/login': typeof LoginRoute
+  '/hr': typeof HrRoute
   '/privacy': typeof PrivacyRoute
   '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/applications': typeof ApplicationsRoute
   '/calendar': typeof CalendarRoute
   '/login': typeof LoginRoute
+  '/hr': typeof HrRoute
   '/privacy': typeof PrivacyRoute
   '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/applications': typeof ApplicationsRoute
   '/calendar': typeof CalendarRoute
   '/login': typeof LoginRoute
+  '/hr': typeof HrRoute
   '/privacy': typeof PrivacyRoute
   '/settings': typeof SettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/applications'
     | '/calendar'
     | '/login'
+    | '/hr'
     | '/privacy'
     | '/settings'
     | '/auth/callback'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/applications'
     | '/calendar'
     | '/login'
+    | '/hr'
     | '/privacy'
     | '/settings'
     | '/auth/callback'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/applications'
     | '/calendar'
     | '/login'
+    | '/hr'
     | '/privacy'
     | '/settings'
     | '/auth/callback'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   ApplicationsRoute: typeof ApplicationsRoute
   CalendarRoute: typeof CalendarRoute
   LoginRoute: typeof LoginRoute
+  HrRoute: typeof HrRoute
   PrivacyRoute: typeof PrivacyRoute
   SettingsRoute: typeof SettingsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
@@ -155,6 +168,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr': {
+      id: '/hr'
+      path: '/hr'
+      fullPath: '/hr'
+      preLoaderRoute: typeof HrRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calendar': {
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApplicationsRoute: ApplicationsRoute,
   CalendarRoute: CalendarRoute,
   LoginRoute: LoginRoute,
+  HrRoute: HrRoute,
   PrivacyRoute: PrivacyRoute,
   SettingsRoute: SettingsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
