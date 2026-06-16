@@ -40,9 +40,11 @@ function HRDashboard() {
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const loadInterviews = () => {
+    if (!user?.id) return;
     supabase
       .from("interviews")
       .select("*")
+      .eq("user_id", user.id) // sirf is HR ke apne interviews — doosre HR ka data nahi
       .order("scheduled_at", { ascending: true })
       .then(({ data, error }: any) => {
         console.log("✅ HR Interviews Data:", data);
@@ -59,19 +61,20 @@ function HRDashboard() {
 
   useEffect(() => {
     loadInterviews();
-  }, []);
+  }, [user?.id]);
 
   const handleSchedule = async () => {
-    if (!form.name || !form.role || !form.datetime) return;
+    if (!form.name || !form.role || !form.datetime || !user?.id) return;
     setLoading(true);
 
-    // Database mein save karo — sirf local state mein nahi
+    // Database mein save karo, apna user_id tag karke — sirf local state mein nahi
     const { data, error } = await supabase
       .from("interviews")
       .insert({
         candidate_name: form.name,
         role: form.role,
         scheduled_at: new Date(form.datetime).toISOString(),
+        user_id: user.id,
       })
       .select()
       .single();
