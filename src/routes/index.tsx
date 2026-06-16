@@ -28,11 +28,10 @@ function greeting() {
 }
 
 function HRDashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const firstName = user?.name || user?.email?.split("@")[0] || "HR";
 
-  // Candidates ab "interviews" table se aate hain — Candidate ki "applications" table se NAHI
   const [candidates, setCandidates] = useState<any[]>([]);
   const [form, setForm] = useState({ name: "", role: "", datetime: "" });
   const [saved, setSaved] = useState(false);
@@ -44,12 +43,9 @@ function HRDashboard() {
     supabase
       .from("interviews")
       .select("*")
-      .eq("user_id", user.id) // sirf is HR ke apne interviews — doosre HR ka data nahi
+      .eq("user_id", user.id)
       .order("scheduled_at", { ascending: true })
       .then(({ data, error }: any) => {
-        console.log("✅ HR Interviews Data:", data);
-        console.log("❌ Error (if any):", error);
-
         if (error) {
           setFetchError(error.message);
           return;
@@ -67,7 +63,6 @@ function HRDashboard() {
     if (!form.name || !form.role || !form.datetime || !user?.id) return;
     setLoading(true);
 
-    // Database mein save karo, apna user_id tag karke — sirf local state mein nahi
     const { data, error } = await supabase
       .from("interviews")
       .insert({
@@ -80,13 +75,11 @@ function HRDashboard() {
       .single();
 
     if (error) {
-      console.error("❌ Schedule insert error:", error);
       setFetchError(error.message);
       setLoading(false);
       return;
     }
 
-    // List ko naye record ke saath update karo (refetch ki zaroorat nahi)
     setCandidates((prev) => [data, ...prev]);
     setForm({ name: "", role: "", datetime: "" });
     setSaved(true);
@@ -94,14 +87,14 @@ function HRDashboard() {
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("userRole");
+  // ✅ localStorage hata diya — Supabase signOut use ho raha hai
+  const handleLogout = async () => {
+    await logout();
     navigate({ to: "/login" });
   };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">
@@ -122,14 +115,12 @@ function HRDashboard() {
         </div>
       </div>
 
-      {/* Error Banner */}
       {fetchError && (
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
           ⚠️ Data error: {fetchError}
         </div>
       )}
 
-      {/* Candidates / Interviews Table */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
         <h2 className="text-lg font-semibold mb-4">
           👥 Candidates{" "}
@@ -183,7 +174,7 @@ function HRDashboard() {
                     </td>
                     <td className="py-3">
                       {c.meet_link ? (
-                        <a
+                        
                           href={c.meet_link}
                           target="_blank"
                           rel="noreferrer"
@@ -203,7 +194,6 @@ function HRDashboard() {
         </div>
       </div>
 
-      {/* Schedule Interview */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
         <h2 className="text-lg font-semibold mb-4">📅 Schedule Interview</h2>
         <div className="flex flex-col gap-3 max-w-md">
@@ -242,14 +232,12 @@ function HRDashboard() {
 }
 
 function Dashboard() {
-  const userRole = localStorage.getItem("userRole");
-  if (userRole === "hr") return <HRDashboard />;
-
-  const { user } = useAuth();
+  // ✅ Hooks pehle — localStorage wala role check hata diya
+  const { user, ready } = useAuth();
   const navigate = useNavigate();
-  const firstName = user?.name || user?.email.split("@")[0] || "there";
   const { data: rows = [], isLoading } = useApplications();
   const [reportTime, setReportTime] = useState<string | null>(null);
+
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-US", {
     weekday: "long",
@@ -275,6 +263,14 @@ function Dashboard() {
         }
       });
   }, [user]);
+
+  // ✅ Auth load hone tak wait karo
+  if (!ready) return null;
+
+  // ✅ Supabase se role check — localStorage nahi
+  if (user?.role === "hr") return <HRDashboard />;
+
+  const firstName = user?.name || user?.email?.split("@")[0] || "there";
 
   return (
     <div className="space-y-6">
