@@ -27,62 +27,64 @@ function greeting() {
   return "Good evening";
 }
 
-// Meet link helper — handles different possible column names
-function getMeetLink(c: any): string | null {
-  return (
-    c.meet_link ||
-    c.meeting_link ||
-    c.google_meet_link ||
-    c.meetLink ||
-    c.meetingLink ||
-    null
-  );
-}
-
-// Interview time helper — handles different possible column names
-function getInterviewTime(c: any): string | null {
-  return (
-    c.interview_time ||
-    c.interviewTime ||
-    c.scheduled_at ||
-    c.interview_date ||
-    null
-  );
-}
-
 function HRDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const firstName = user?.name || user?.email?.split("@")[0] || "HR";
+
+  // Candidates ab "interviews" table se aate hain — Candidate ki "applications" table se NAHI
   const [candidates, setCandidates] = useState<any[]>([]);
   const [form, setForm] = useState({ name: "", role: "", datetime: "" });
-  const [interviews, setInterviews] = useState<any[]>([]);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadInterviews = () => {
     supabase
-      .from("applications")
-      .select("*") // sabhi columns fetch karo taake koi column miss na ho
-      .order("created_at", { ascending: false })
+      .from("interviews")
+      .select("*")
+      .order("scheduled_at", { ascending: true })
       .then(({ data, error }: any) => {
-        // Debug: Console mein check karo kya aa raha hai
-        console.log("✅ HR Candidates Data:", data);
+        console.log("✅ HR Interviews Data:", data);
         console.log("❌ Error (if any):", error);
 
         if (error) {
           setFetchError(error.message);
           return;
         }
+        setFetchError(null);
         if (data) setCandidates(data);
       });
+  };
+
+  useEffect(() => {
+    loadInterviews();
   }, []);
 
   const handleSchedule = async () => {
     if (!form.name || !form.role || !form.datetime) return;
     setLoading(true);
-    setInterviews([...interviews, form]);
+
+    // Database mein save karo — sirf local state mein nahi
+    const { data, error } = await supabase
+      .from("interviews")
+      .insert({
+        candidate_name: form.name,
+        role: form.role,
+        scheduled_at: new Date(form.datetime).toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("❌ Schedule insert error:", error);
+      setFetchError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    // List ko naye record ke saath update karo (refetch ki zaroorat nahi)
+    setCandidates((prev) => [data, ...prev]);
     setForm({ name: "", role: "", datetime: "" });
     setSaved(true);
     setLoading(false);
@@ -120,11 +122,11 @@ function HRDashboard() {
       {/* Error Banner */}
       {fetchError && (
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-          ⚠️ Data fetch error: {fetchError}
+          ⚠️ Data error: {fetchError}
         </div>
       )}
 
-      {/* Candidates Table */}
+      {/* Candidates / Interviews Table */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
         <h2 className="text-lg font-semibold mb-4">
           👥 Candidates{" "}
@@ -134,7 +136,7 @@ function HRDashboard() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-slate-400 border-b border-white/10">
-                <th className="text-left py-2 pr-4">Company</th>
+                <th className="text-left py-2 pr-4">Candidate</th>
                 <th className="text-left py-2 pr-4">Role</th>
                 <th className="text-left py-2 pr-4">Status</th>
                 <th className="text-left py-2 pr-4">Interview Time</th>
@@ -149,53 +151,49 @@ function HRDashboard() {
                   </td>
                 </tr>
               ) : (
-                candidates.map((c, i) => {
-                  const meetLink = getMeetLink(c);
-                  const interviewTime = getInterviewTime(c);
-                  return (
-                    <tr key={c.id ?? i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="py-3 pr-4 text-white font-medium">{c.company || "—"}</td>
-                      <td className="py-3 pr-4 text-slate-300">{c.role || "—"}</td>
-                      <td className="py-3 pr-4">
-                        <span
-                          className={`px-2 py-1 rounded-lg text-xs ${
-                            c.status === "INTERVIEW"
-                              ? "bg-violet-500/20 text-violet-300"
-                              : c.status === "APPLIED"
-                              ? "bg-blue-500/20 text-blue-300"
-                              : c.status === "REJECTED"
-                              ? "bg-red-500/20 text-red-300"
-                              : "bg-white/10 text-slate-300"
-                          }`}
+                candidates.map((c, i) => (
+                  <tr key={c.id ?? i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td className="py-3 pr-4 text-white font-medium">{c.candidate_name || "—"}</td>
+                    <td className="py-3 pr-4 text-slate-300">{c.role || "—"}</td>
+                    <td className="py-3 pr-4">
+                      <span
+                        className={`px-2 py-1 rounded-lg text-xs ${
+                          c.status === "SCHEDULED"
+                            ? "bg-violet-500/20 text-violet-300"
+                            : c.status === "COMPLETED"
+                            ? "bg-emerald-500/20 text-emerald-300"
+                            : c.status === "CANCELLED"
+                            ? "bg-red-500/20 text-red-300"
+                            : "bg-white/10 text-slate-300"
+                        }`}
+                      >
+                        {c.status || "—"}
+                      </span>
+                    </td>
+                    <td className="py-3 pr-4 text-slate-400 text-xs">
+                      {c.scheduled_at
+                        ? new Date(c.scheduled_at).toLocaleString("en-PK", {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          })
+                        : "—"}
+                    </td>
+                    <td className="py-3">
+                      {c.meet_link ? (
+                        <a
+                          href={c.meet_link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-cyan-400 hover:underline"
                         >
-                          {c.status || "—"}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-4 text-slate-400 text-xs">
-                        {interviewTime
-                          ? new Date(interviewTime).toLocaleString("en-PK", {
-                              dateStyle: "medium",
-                              timeStyle: "short",
-                            })
-                          : "—"}
-                      </td>
-                      <td className="py-3">
-                        {meetLink ? (
-                          <a
-                            href={meetLink}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-xs text-cyan-400 hover:underline"
-                          >
-                            🔗 Join Meet
-                          </a>
-                        ) : (
-                          <span className="text-xs text-slate-600">No link</span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })
+                          🔗 Join Meet
+                        </a>
+                      ) : (
+                        <span className="text-xs text-slate-600">No link</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
@@ -235,24 +233,6 @@ function HRDashboard() {
           </button>
           {saved && <p className="text-xs text-green-400">✅ Interview scheduled!</p>}
         </div>
-
-        {interviews.length > 0 && (
-          <div className="mt-6 space-y-2">
-            <h3 className="text-sm text-slate-400 mb-2">Upcoming Interviews:</h3>
-            {interviews.map((iv, i) => (
-              <div
-                key={i}
-                className="flex gap-4 text-sm border border-white/10 rounded-xl px-4 py-2.5 bg-white/5"
-              >
-                <span className="text-violet-400 font-medium">{iv.name}</span>
-                <span className="text-slate-400">{iv.role}</span>
-                <span className="text-slate-500 ml-auto">
-                  {new Date(iv.datetime).toLocaleString()}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
