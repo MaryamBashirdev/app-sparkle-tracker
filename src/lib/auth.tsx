@@ -16,7 +16,7 @@ const supabase = createClient(
 
 export { supabase };
 
-type User = { id: string; email: string; name?: string };
+type User = { id: string; email: string; name?: string; role?: string };
 
 function getUserName(u: any): string | undefined {
   const meta = u?.user_metadata;
@@ -25,6 +25,15 @@ function getUserName(u: any): string | undefined {
   const email = u?.email;
   if (email) return email.split("@")[0];
   return undefined;
+}
+
+async function getUserRole(userId: string): Promise<string> {
+  const { data } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", userId)
+    .maybeSingle();
+  return data?.role ?? "candidate";
 }
 
 type AuthContextType = {
@@ -43,18 +52,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       const u = data.session?.user;
       if (u?.id && u?.email) {
-        setUser({ id: u.id, email: u.email, name: getUserName(u) });
+        const role = await getUserRole(u.id);
+        setUser({ id: u.id, email: u.email, name: getUserName(u), role });
       }
       setReady(true);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const u = session?.user;
       if (u?.id && u?.email) {
-        setUser({ id: u.id, email: u.email, name: getUserName(u) });
+        const role = await getUserRole(u.id);
+        setUser({ id: u.id, email: u.email, name: getUserName(u), role });
       } else {
         setUser(null);
       }
