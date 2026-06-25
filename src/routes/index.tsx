@@ -334,6 +334,7 @@ function HRDashboard() {
   const [jobDesc, setJobDesc] = useState("");
   const [jobDescSaved, setJobDescSaved] = useState(false);
   const [jobDescLoading, setJobDescLoading] = useState(false);
+  const [jobDescOpen, setJobDescOpen] = useState(false);
 
   const loadInterviews = () => {
     if (!user?.id) return;
@@ -532,27 +533,57 @@ function HRDashboard() {
 
       {/* Job Description */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-        <h2 className="text-lg font-semibold mb-4">📋 Job Description</h2>
-        <p className="text-sm text-slate-400 mb-3">
-          Yeh job description AI candidate screening ke liye use hogi.
-        </p>
-        <div className="flex flex-col gap-3 max-w-md">
-          <textarea
-            rows={6}
-            placeholder="Enter job description here... (e.g. We are looking for a React developer with 2+ years experience...)"
-            value={jobDesc}
-            onChange={(e) => setJobDesc(e.target.value)}
-            className="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-violet-500 resize-none"
-          />
-          <button
-            onClick={handleSaveJobDesc}
-            disabled={jobDescLoading}
-            className="rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
-          >
-            {jobDescLoading ? "Saving..." : "Save Job Description"}
-          </button>
-          {jobDescSaved && <p className="text-xs text-green-400">✅ Job description saved!</p>}
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-lg font-semibold">📋 Job Description</h2>
+          {!jobDescOpen && (
+            <button
+              onClick={() => setJobDescOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              <Plus className="h-4 w-4" />
+              Add Description
+            </button>
+          )}
         </div>
+
+        {jobDescOpen && (
+          <div className="mt-4 flex flex-col gap-3 max-w-md">
+            <p className="text-sm text-slate-400">
+              Yeh job description AI candidate screening ke liye use hogi.
+            </p>
+            <textarea
+              rows={6}
+              autoFocus
+              placeholder="Enter job description here... (e.g. We are looking for a React developer with 2+ years experience...)"
+              value={jobDesc}
+              onChange={(e) => setJobDesc(e.target.value)}
+              className="rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-violet-500 resize-none"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={handleSaveJobDesc}
+                disabled={jobDescLoading}
+                className="flex-1 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+              >
+                {jobDescLoading ? "Saving..." : "Save Job Description"}
+              </button>
+              <button
+                onClick={() => setJobDescOpen(false)}
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-400 hover:bg-white/10"
+              >
+                Cancel
+              </button>
+            </div>
+            {jobDescSaved && <p className="text-xs text-green-400">✅ Job description saved!</p>}
+          </div>
+        )}
+
+        {!jobDescOpen && jobDesc && (
+          <p className="mt-2 text-sm text-slate-400 line-clamp-2">{jobDesc}</p>
+        )}
+        {!jobDescOpen && !jobDesc && (
+          <p className="mt-2 text-xs text-slate-600">Koi description nahi. "Add Description" par click karein.</p>
+        )}
       </div>
     </div>
   );
