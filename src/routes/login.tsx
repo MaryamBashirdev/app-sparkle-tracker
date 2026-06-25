@@ -25,6 +25,20 @@ function LoginPage() {
   useEffect(() => {
     if (ready && user) {
       const savedRole = localStorage.getItem("userRole");
+
+      if (savedRole) {
+        fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/users?id=eq.${user.id}`, {
+          method: "PATCH",
+          headers: {
+            "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal",
+          },
+          body: JSON.stringify({ role: savedRole }),
+        });
+      }
+
       if (savedRole === "hr") {
         navigate({ to: "/hr", replace: true });
       } else {
