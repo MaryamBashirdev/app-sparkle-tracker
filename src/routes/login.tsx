@@ -77,13 +77,7 @@ function LoginPage() {
           <div className="mt-10 flex flex-col items-center gap-4">
             {!role && (
               <div className="w-full flex flex-col gap-3">
-                <p className="text-sm text-slate-400 text-center mb-2">Select your role to continue</p>
-                <button
-                  onClick={() => setRole("candidate")}
-                  className="w-full py-3 px-4 rounded-xl border border-violet-500/40 bg-violet-500/10 hover:bg-violet-500/20 text-white font-medium transition-all"
-                >
-                  🎯 Continue as Candidate
-                </button>
+                <p className="text-sm text-slate-400 text-center mb-2">Sign in to continue</p>
                 <button
                   onClick={() => setRole("hr")}
                   className="w-full py-3 px-4 rounded-xl border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-white font-medium transition-all"
@@ -96,7 +90,7 @@ function LoginPage() {
             {role && (
               <>
                 <p className="text-sm text-slate-400">
-                  Signing in as <span className="text-violet-400 font-semibold">{role === "hr" ? "HR" : "Candidate"}</span>
+                  Signing in as <span className="text-violet-400 font-semibold">HR</span>
                 </p>
                 <button
                   type="button"
@@ -119,7 +113,7 @@ function LoginPage() {
                   )}
                 </button>
                 <button onClick={() => setRole(null)} className="text-xs text-slate-500 hover:text-slate-300">
-                  ← Change role
+                  ← Back
                 </button>
               </>
             )}
