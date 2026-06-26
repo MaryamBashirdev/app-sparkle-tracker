@@ -625,7 +625,7 @@ function Dashboard() {
   }, [user]);
 
   if (!ready) return null;
-  (user?.role === "hr") return <HRDashboard />;
+  return <HRDashboard />;
 
   const firstName = user?.name || user?.email?.split("@")[0] || "there";
 
