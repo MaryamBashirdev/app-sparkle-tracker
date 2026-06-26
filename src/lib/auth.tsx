@@ -28,12 +28,21 @@ function getUserName(u: any): string | undefined {
 }
 
 async function getUserRole(userId: string): Promise<string> {
+  const localRole = localStorage.getItem("userRole");
+
   const { data } = await supabase
     .from("users")
     .select("role")
     .eq("id", userId)
     .maybeSingle();
-  return data?.role ?? "candidate";
+
+  if (!data) {
+    const role = localRole || "candidate";
+    await supabase.from("users").upsert({ id: userId, role });
+    return role;
+  }
+
+  return data?.role ?? localRole ?? "candidate";
 }
 
 type AuthContextType = {
@@ -102,6 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     await supabase.auth.signOut();
     setUser(null);
+    localStorage.removeItem("userRole");
   };
 
   return (
