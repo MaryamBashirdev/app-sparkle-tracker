@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { scanAllHrInboxes, type ScanEnv } from "./lib/hrInboxScan";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -76,5 +77,9 @@ export default {
       console.error(error);
       return brandedErrorResponse();
     }
+  },
+
+  async scheduled(event: unknown, env: ScanEnv, ctx: { waitUntil: (p: Promise<unknown>) => void }) {
+    ctx.waitUntil(scanAllHrInboxes(env));
   },
 };
