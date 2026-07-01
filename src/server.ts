@@ -51,8 +51,6 @@ function isCatastrophicSsrErrorBody(body: string, responseStatus: number): boole
   );
 }
 
-// h3 swallows in-handler throws into a normal 500 Response with body
-// {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
 async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
   if (response.status < 500) return response;
   const contentType = response.headers.get("content-type") ?? "";
@@ -80,6 +78,12 @@ export default {
   },
 
   async scheduled(event: unknown, env: ScanEnv, ctx: { waitUntil: (p: Promise<unknown>) => void }) {
-    ctx.waitUntil(scanAllHrInboxes(env));
+    console.log("[scheduled] handler fired");
+    try {
+      await scanAllHrInboxes(env);
+    } catch (e) {
+      console.error("[scheduled] top-level error:", String(e));
+    }
+    console.log("[scheduled] handler done");
   },
 };
