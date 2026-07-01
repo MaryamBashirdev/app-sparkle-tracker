@@ -57,6 +57,7 @@ function pickInterviewSlot(): string {
 }
 
 export async function scanAllHrInboxes(env: ScanEnv): Promise<void> {
+  console.log("[HR Scan] Starting...");
   const supabase = createClient(SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
 
   const { data: hrUsers, error } = await supabase
@@ -66,17 +67,20 @@ export async function scanAllHrInboxes(env: ScanEnv): Promise<void> {
     .not("job_description", "is", null);
 
   if (error) {
-    console.error("Failed to load HR users:", error.message);
+    console.error("[HR Scan] Supabase error:", error.message);
     return;
   }
+
+  console.log(`[HR Scan] ${(hrUsers ?? []).length} user(s) to scan`);
 
   for (const hr of (hrUsers ?? []) as HrUserRow[]) {
     try {
       await scanOneHrInbox(supabase, env, hr);
     } catch (e) {
-      console.error(`Failed scanning inbox for user ${hr.user_id}:`, e);
+      console.error(`[HR Scan] Error for user ${hr.user_id}:`, String(e));
     }
   }
+  console.log("[HR Scan] Done.");
 }
 
 async function scanOneHrInbox(
@@ -84,13 +88,15 @@ async function scanOneHrInbox(
   env: ScanEnv,
   hr: HrUserRow,
 ): Promise<void> {
+  console.log(`[HR Scan] Scanning inbox for user ${hr.user_id}...`);
   const accessToken = await refreshAccessToken(hr.refresh_token, env.GOOGLE_CLIENT_ID, env.GOOGLE_CLIENT_SECRET);
   if (!accessToken) {
-    console.error(`Could not refresh Gmail token for user ${hr.user_id}`);
+    console.error(`[HR Scan] Could not refresh Gmail token for user ${hr.user_id}`);
     return;
   }
 
   const ids = await listUnreadMessageIds(accessToken);
+  console.log(`[HR Scan] Found ${ids.length} unread email(s)`);
   if (ids.length === 0) return;
 
   const { data: screened } = await supabase
@@ -100,12 +106,14 @@ async function scanOneHrInbox(
   const alreadyScreened = new Set((screened ?? []).map((r: any) => r.gmail_message_id));
 
   const newIds = ids.filter((id) => !alreadyScreened.has(id));
+  console.log(`[HR Scan] ${newIds.length} new email(s) to screen`);
   if (newIds.length === 0) return;
 
   for (const id of newIds) {
     const email = await getMessage(accessToken, id);
     if (!email) continue;
 
+    console.log(`[HR Scan] Screening: "${email.subject}" from ${email.from}`);
     const verdict = await screenEmail(
       env.MISTRAL_API_KEY,
       hr.job_description,
@@ -114,6 +122,8 @@ async function scanOneHrInbox(
       email.snippet,
     );
 
+    console.log(`[HR Scan] Verdict: is_application=${verdict.is_application}, qualified=${verdict.qualified}`);
+
     await supabase.from("screened_emails").insert({
       user_id: hr.user_id,
       gmail_message_id: id,
@@ -121,6 +131,7 @@ async function scanOneHrInbox(
     });
 
     if (verdict.is_application && verdict.qualified) {
+      console.log(`[HR Scan] Adding qualified candidate: ${verdict.candidate_name}`);
       await supabase.from("interviews").insert({
         user_id: hr.user_id,
         candidate_name: verdict.candidate_name,
